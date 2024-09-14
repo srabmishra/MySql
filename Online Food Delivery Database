@@ -1,0 +1,413 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Sep 14, 2024 at 02:41 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `onlinefooddel`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `delivery`
+--
+
+CREATE TABLE `delivery` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `delivery_person_id` int(11) DEFAULT NULL,
+  `status` enum('assigned','en route','completed') NOT NULL,
+  `pickup_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `delivery_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `delivery`
+--
+
+INSERT INTO `delivery` (`id`, `order_id`, `delivery_person_id`, `status`, `pickup_time`, `delivery_time`, `created_at`) VALUES
+(1, 1, 7, 'assigned', '2024-09-14 10:30:00', '2024-09-14 09:28:38', '2024-09-14 09:28:38'),
+(2, 2, 8, 'en route', '2024-09-14 11:00:00', '2024-09-14 09:28:38', '2024-09-14 09:28:38'),
+(3, 3, 9, 'completed', '2024-09-14 11:30:00', '2024-09-14 13:00:00', '2024-09-14 09:28:38');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `menuitems`
+--
+
+CREATE TABLE `menuitems` (
+  `id` int(11) NOT NULL,
+  `restaurant_id` int(11) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `category` enum('appetizer','main course','dessert') DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `menuitems`
+--
+
+INSERT INTO `menuitems` (`id`, `restaurant_id`, `name`, `description`, `price`, `category`, `created_at`) VALUES
+(1, 1, 'Paneer Tikka', 'Spiced and grilled cottage cheese.', 299.00, 'appetizer', '2024-09-14 09:28:37'),
+(2, 1, 'Butter Mashroom', 'Creamy tomato-based Mashroom curry.', 499.00, 'main course', '2024-09-14 09:28:37'),
+(3, 1, 'Gulab Jamun', 'Fried dough balls in sugar syrup.', 199.00, 'dessert', '2024-09-14 09:28:37'),
+(4, 2, 'Vada Pav', 'Spicy potato fritter sandwich.', 100.00, 'appetizer', '2024-09-14 09:28:37'),
+(5, 2, 'Pav Bhaji', 'Spicy vegetable mash served with bread.', 150.00, 'main course', '2024-09-14 09:28:37'),
+(6, 2, 'Rasgulla', 'Sweet syrupy dessert balls.', 120.00, 'dessert', '2024-09-14 09:28:37'),
+(7, 3, 'Margarita Pizza', 'Classic pizza with tomatoes and cheese.', 399.00, 'main course', '2024-09-14 09:28:37'),
+(8, 3, 'Fruit Salad', 'Fresh salad with Fruit dressing.', 250.00, 'appetizer', '2024-09-14 09:28:37'),
+(9, 3, 'Chocolate Lava Cake', 'Warm chocolate cake with molten center.', 300.00, 'dessert', '2024-09-14 09:28:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orderitems`
+--
+
+CREATE TABLE `orderitems` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `item_id` int(11) DEFAULT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orderitems`
+--
+
+INSERT INTO `orderitems` (`id`, `order_id`, `item_id`, `quantity`, `price`, `created_at`) VALUES
+(1, 1, 1, 2, 299.00, '2024-09-14 09:28:37'),
+(2, 1, 2, 1, 499.00, '2024-09-14 09:28:37'),
+(3, 2, 4, 2, 100.00, '2024-09-14 09:28:37'),
+(4, 2, 5, 1, 150.00, '2024-09-14 09:28:37'),
+(5, 3, 7, 1, 399.00, '2024-09-14 09:28:37'),
+(6, 3, 8, 1, 250.00, '2024-09-14 09:28:37'),
+(7, 3, 9, 1, 300.00, '2024-09-14 09:28:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `restaurant_id` int(11) DEFAULT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `status` enum('pending','preparing','delivered','canceled') NOT NULL,
+  `order_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `delivery_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `address` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `user_id`, `restaurant_id`, `total_amount`, `status`, `order_time`, `delivery_time`, `address`, `created_at`) VALUES
+(1, 1, 1, 798.00, 'pending', '2024-09-14 09:28:37', '2024-09-14 09:28:37', '123 Main Street, Delhi', '2024-09-14 09:28:37'),
+(2, 2, 2, 270.00, 'preparing', '2024-09-14 09:28:37', '2024-09-14 09:28:37', '456 Second Street, Mumbai', '2024-09-14 09:28:37'),
+(3, 3, 3, 649.00, 'delivered', '2024-09-14 09:28:37', '2024-09-14 13:00:00', '789 Third Street, Bangalore', '2024-09-14 09:28:37'),
+(4, 1, 2, 100.00, 'canceled', '2024-09-14 09:28:37', '2024-09-14 09:28:37', '123 Main Street, Delhi', '2024-09-14 09:28:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment`
+--
+
+CREATE TABLE `payment` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_method` enum('credit card','cash') NOT NULL,
+  `payment_status` enum('completed','pending') NOT NULL,
+  `transaction_id` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payment`
+--
+
+INSERT INTO `payment` (`id`, `order_id`, `amount`, `payment_method`, `payment_status`, `transaction_id`, `created_at`) VALUES
+(1, 1, 798.00, 'credit card', 'completed', 'txn_12345', '2024-09-14 09:28:38'),
+(2, 2, 270.00, 'cash', 'pending', NULL, '2024-09-14 09:28:38'),
+(3, 3, 649.00, 'credit card', 'completed', 'txn_67890', '2024-09-14 09:28:38');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `restaurants`
+--
+
+CREATE TABLE `restaurants` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `restaurants`
+--
+
+INSERT INTO `restaurants` (`id`, `name`, `description`, `address`, `phone_number`, `email`, `owner_id`, `created_at`) VALUES
+(1, 'Delhi Spice', 'Authentic North Indian cuisine.', '101 Restaurant Lane, Delhi', '9876543210', 'delhi.spice@example.com', 4, '2024-09-14 09:28:37'),
+(2, 'Mumbai Delights', 'Famous for its street food and local dishes.', '202 Eatery Road, Mumbai', '9123456789', 'mumbai.delights@example.com', 5, '2024-09-14 09:28:37'),
+(3, 'Bangalore Bistro', 'Cozy place with a mix of Indian and Continental dishes.', '303 Café Avenue, Bangalore', '9345678901', 'bangalore.bistro@example.com', 6, '2024-09-14 09:28:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `restaurant_id` int(11) DEFAULT NULL,
+  `rating` int(11) DEFAULT NULL CHECK (`rating` >= 1 and `rating` <= 5),
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reviews`
+--
+
+INSERT INTO `reviews` (`id`, `user_id`, `restaurant_id`, `rating`, `comment`, `created_at`) VALUES
+(1, 1, 1, 5, 'Excellent food, loved the Paneer Tikka!', '2024-09-14 09:28:37'),
+(2, 2, 2, 4, 'Good Vada Pav but a bit spicy.', '2024-09-14 09:28:37'),
+(3, 3, 3, 5, 'Great pizza and desserts!', '2024-09-14 09:28:37'),
+(4, 1, 2, 3, 'The Pav Bhaji was average.', '2024-09-14 09:28:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `user_type` enum('customer','restaurant','delivery_person') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `phone_number`, `address`, `user_type`, `created_at`) VALUES
+(1, 'Rajesh Kumar', 'rajesh.kumar@example.com', 'hashed_password1', '9876543210', '123 Main Street, Delhi', 'customer', '2024-09-14 09:28:37'),
+(2, 'Anita Sharma', 'anita.sharma@example.com', 'hashed_password2', '9123456789', '456 Second Street, Mumbai', 'customer', '2024-09-14 09:28:37'),
+(3, 'Ravi Patel', 'ravi.patel@example.com', 'hashed_password3', '9345678901', '789 Third Street, Bangalore', 'customer', '2024-09-14 09:28:37'),
+(4, 'Chef Aarav', 'chef.aarav@example.com', 'hashed_password4', '9988776655', '101 Restaurant Lane, Delhi', 'restaurant', '2024-09-14 09:28:37'),
+(5, 'Nisha Verma', 'nisha.verma@example.com', 'hashed_password5', '8877665544', '202 Eatery Road, Mumbai', 'restaurant', '2024-09-14 09:28:37'),
+(6, 'Ravi Reddy', 'ravi.reddy@example.com', 'hashed_password6', '7766554433', '303 Café Avenue, Bangalore', 'restaurant', '2024-09-14 09:28:37'),
+(7, 'Vikram Singh', 'vikram.singh@example.com', 'hashed_password7', '6655443322', '404 Delivery Street, Delhi', 'delivery_person', '2024-09-14 09:28:37'),
+(8, 'Sneha Iyer', 'sneha.iyer@example.com', 'hashed_password8', '5544332211', '505 Ride Way, Mumbai', 'delivery_person', '2024-09-14 09:28:37'),
+(9, 'Deepak Joshi', 'deepak.joshi@example.com', 'hashed_password9', '4433221100', '606 Courier Path, Bangalore', 'delivery_person', '2024-09-14 09:28:37');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `delivery`
+--
+ALTER TABLE `delivery`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `delivery_person_id` (`delivery_person_id`);
+
+--
+-- Indexes for table `menuitems`
+--
+ALTER TABLE `menuitems`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `restaurant_id` (`restaurant_id`);
+
+--
+-- Indexes for table `orderitems`
+--
+ALTER TABLE `orderitems`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `item_id` (`item_id`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `restaurant_id` (`restaurant_id`);
+
+--
+-- Indexes for table `payment`
+--
+ALTER TABLE `payment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_id` (`order_id`);
+
+--
+-- Indexes for table `restaurants`
+--
+ALTER TABLE `restaurants`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `owner_id` (`owner_id`);
+
+--
+-- Indexes for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `restaurant_id` (`restaurant_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `delivery`
+--
+ALTER TABLE `delivery`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `menuitems`
+--
+ALTER TABLE `menuitems`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `orderitems`
+--
+ALTER TABLE `orderitems`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `payment`
+--
+ALTER TABLE `payment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `restaurants`
+--
+ALTER TABLE `restaurants`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `delivery`
+--
+ALTER TABLE `delivery`
+  ADD CONSTRAINT `delivery_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
+  ADD CONSTRAINT `delivery_ibfk_2` FOREIGN KEY (`delivery_person_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `menuitems`
+--
+ALTER TABLE `menuitems`
+  ADD CONSTRAINT `menuitems_ibfk_1` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`);
+
+--
+-- Constraints for table `orderitems`
+--
+ALTER TABLE `orderitems`
+  ADD CONSTRAINT `orderitems_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
+  ADD CONSTRAINT `orderitems_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `menuitems` (`id`);
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`);
+
+--
+-- Constraints for table `payment`
+--
+ALTER TABLE `payment`
+  ADD CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`);
+
+--
+-- Constraints for table `restaurants`
+--
+ALTER TABLE `restaurants`
+  ADD CONSTRAINT `restaurants_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
